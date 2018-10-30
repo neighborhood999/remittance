@@ -1,5 +1,7 @@
 pragma solidity ^0.4.24;
 
-contract Remittance {
+import "./Ownable.sol";
+
+contract Remittance is Ownable {
     // TODO:
 }
