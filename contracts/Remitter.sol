@@ -59,16 +59,16 @@ contract Remitter is Ownable {
         string password1,
         string password2
     ) public returns (bool) {
+        require(bytes(password1).length != 0, "password1 is required");
+        require(bytes(password2).length != 0, "password2 is required");
+        require(balance > 0, "Nothing to withdraw, balance equals 0");
+
         bytes32 passwordHash = generatePasswordHash(
             msg.sender,
             password1,
             password2
         );
         uint balance = remittances[passwordHash].balance;
-
-        require(bytes(password1).length != 0, "password1 is required");
-        require(bytes(password2).length != 0, "password2 is required");
-        require(balance > 0, "Nothing to withdraw, balance equals 0");
 
         remittances[passwordHash].balance = 0;
         emit LogWithdraw(msg.sender, balance);
