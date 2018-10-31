@@ -16,12 +16,12 @@
     "@babel/polyfill": "^7.0.0",
     "@babel/preset-env": "^7.1.0",
     "@babel/register": "^7.0.0",
-    "bignumber.js": "^7.2.1",
     "bluebird": "^3.5.2",
     "chai": "^4.2.0",
     "ganache-cli": "^6.1.8",
     "solidity-coverage": "^0.5.11",
-    "truffle": "^4.1.14"
+    "truffle": "^4.1.14",
+    "web3-utils": "^1.0.0-beta.36"
   },
   "license": "MIT"
 }
