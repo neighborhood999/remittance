@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import { BigNumber } from 'bignumber.js';
 import web3Utils from 'web3-utils';
 import { default as Promise } from 'bluebird';
 import expectedException from '../utils/expectedException';
@@ -29,7 +30,7 @@ contract('Remitter', accounts => {
 
   describe('remittance function', () => {
     it('should fail if msg.value equals 0', async () => {
-      const value = web3.toWei('0', 'ether');
+      const value = web3Utils.toWei('0', 'ether');
 
       await expectedException(
         () => remitter.sendFund(bob, passwordHash, 1, { from: alice, value }),
@@ -38,7 +39,7 @@ contract('Remitter', accounts => {
     });
 
     it('should fail if exchanger address equals address(0)', async () => {
-      const value = web3.toWei('0.1', 'ether');
+      const value = web3Utils.toWei('0.1', 'ether');
 
       await expectedException(
         () => remitter.sendFund('0x0', passwordHash, 1, { from: alice, value }),
@@ -47,7 +48,7 @@ contract('Remitter', accounts => {
     });
 
     it('should fail if remittance balance not equals 0', async () => {
-      const value = web3.toWei('0.1', 'ether');
+      const value = web3Utils.toWei('0.1', 'ether');
 
       await remitter.sendFund(bob, passwordHash, 1, {
         from: alice,
@@ -65,7 +66,7 @@ contract('Remitter', accounts => {
     });
 
     it('should fail if duration equals 0', async () => {
-      const value = web3.toWei('0.1', 'ether');
+      const value = web3Utils.toWei('0.1', 'ether');
 
       await expectedException(
         () =>
@@ -113,6 +114,16 @@ contract('Remitter', accounts => {
   });
 
   describe('withdraw function', () => {
+    it('should fail if remittance balances is empty', async () => {
+      await expectedException(
+        () =>
+          remitter.withdraw(bobPassword, carolPassword, {
+            from: bob
+          }),
+        3000000
+      );
+    });
+
     it('should fail if password equals empty', async () => {
       const value = web3Utils.toWei('0.1', 'ether');
 
@@ -151,7 +162,9 @@ contract('Remitter', accounts => {
       expect(log.event).to.equal('LogWithdraw');
       expect(log.args.from).to.equal(bob);
       expect(log.args.balance.toString(10)).to.equal(value.toString(10));
+      expect(BigNumber(remittanceAfter[0]).toString(10)).to.equal('0');
       expect(remittanceAfter[1].toString(10)).to.equal('0');
+      expect(remittanceAfter[2].toString(10)).to.equal('0');
     });
   });
 });
