@@ -19,7 +19,7 @@ contract Ownable {
         emit OwnershipTransferred(address(0), _owner);
     }
 
-    function owner() public view returns(address) {
+    function getOwner() public view returns(address) {
         return _owner;
     }
 
@@ -29,6 +29,7 @@ contract Ownable {
 
     function transferOwnership(address newOwner) public onlyOwner {
         require(newOwner != address(0), "Owner address is required");
+        require(newOwner != _owner, "newOwner same as the original owner");
 
         emit OwnershipTransferred(_owner, newOwner);
 
