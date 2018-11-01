@@ -24,9 +24,9 @@ contract Remitter is Ownable {
 
     function generatePasswordHash(
         address exchanger,
-        string password1,
-        string password2
-    ) private pure returns (bytes32) {
+        bytes32 password1,
+        bytes32 password2
+    ) public pure returns (bytes32) {
         return keccak256(abi.encodePacked(exchanger, password1, password2));
     }
 
@@ -56,19 +56,19 @@ contract Remitter is Ownable {
     }
 
     function withdraw(
-        string password1,
-        string password2
+        bytes32 password1,
+        bytes32 password2
     ) public returns (bool) {
-        require(bytes(password1).length != 0, "password1 is required");
-        require(bytes(password2).length != 0, "password2 is required");
-        require(balance > 0, "Nothing to withdraw, balance equals 0");
-
         bytes32 passwordHash = generatePasswordHash(
             msg.sender,
             password1,
             password2
         );
         uint balance = remittances[passwordHash].balance;
+
+        require(password1.length != 0, "password1 is required");
+        require(password2.length != 0, "password2 is required");
+        require(balance > 0, "Nothing to withdraw, balance equals 0");
 
         remittances[passwordHash].balance = 0;
         emit LogWithdraw(msg.sender, balance);

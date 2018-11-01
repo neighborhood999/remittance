@@ -20,7 +20,11 @@ contract('Remitter', accounts => {
   let passwordHash;
   beforeEach('deploy new instance', async () => {
     remitter = await Remitter.new({ from: alice });
-    passwordHash = web3Utils.soliditySha3(bob, bobPassword, carolPassword);
+    passwordHash = await remitter.generatePasswordHash(
+      bob,
+      bobPassword,
+      carolPassword
+    );
   });
 
   describe('remittance function', () => {
@@ -136,12 +140,11 @@ contract('Remitter', accounts => {
       });
 
       const remittanceBefore = await remitter.remittances(passwordHash);
+      expect(remittanceBefore[1].toString(10)).to.equal(value.toString(10));
+
       const tx = await remitter.withdraw(bobPassword, carolPassword, {
         from: bob
       });
-
-      expect(remittanceBefore[1].toString(10)).to.equal(value.toString(10));
-
       const log = logEvent(tx);
       const remittanceAfter = await remitter.remittances(passwordHash);
 
