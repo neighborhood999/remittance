@@ -167,4 +167,30 @@ contract('Remitter', accounts => {
       expect(remittanceAfter[2].toString(10)).to.equal('0');
     });
   });
+
+  describe('Ownable', () => {
+    it('should get contract owner', async () => {
+      const bobGetContractOwner = await remitter.getOwner({ from: bob });
+
+      expect(bobGetContractOwner).to.equal(alice);
+    });
+
+    it('should check contract owner is alice', async () => {
+      const isOwner = await remitter.isOwner({ from: alice });
+
+      expect(isOwner).to.equal(true);
+    });
+
+    it('should transfer ownership to bob', async () => {
+      const tx = await remitter.transferOwnership(bob, { from: alice });
+      const log = logEvent(tx);
+
+      expect(log.event).to.equal('OwnershipTransferred');
+      expect(log.args.previousOwner).to.equal(alice);
+      expect(log.args.newOwner).to.equal(bob);
+
+      const isOwner = await remitter.isOwner({ from: bob });
+      expect(isOwner).to.equal(true);
+    });
+  });
 });
