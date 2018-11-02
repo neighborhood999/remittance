@@ -69,7 +69,7 @@ contract Remitter is Ownable {
         Remittance storage remittance = remittances[passwordHash];
 
         uint balance = remittance.balance;
-        assert(balance > 0);
+        require(balance > 0, "Balance must greater than 0");
 
         remittance.exchanger = address(0);
         remittance.balance = 0;

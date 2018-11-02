@@ -6,14 +6,14 @@ import expectedException from '../utils/expectedException';
 
 const Remitter = artifacts.require('Remitter');
 
-const logEvent = ({ logs: [log] }) => log;
+const getTxEvent1stLog = ({ logs: [log] }) => log;
 
 if (typeof web3.eth.getBlockPromise !== 'function') {
   Promise.promisifyAll(web3.eth, { suffix: 'Promise' });
 }
 
 contract('Remitter', accounts => {
-  const [alice, bob, carol] = accounts;
+  const [alice, bob] = accounts;
   const bobPassword = 'bobPassword';
   const carolPassword = 'carolPassword';
 
@@ -32,18 +32,16 @@ contract('Remitter', accounts => {
     it('should fail if msg.value equals 0', async () => {
       const value = web3Utils.toWei('0', 'ether');
 
-      await expectedException(
-        () => remitter.sendFund(bob, passwordHash, 1, { from: alice, value }),
-        3000000
+      await expectedException(() =>
+        remitter.sendFund(bob, passwordHash, 1, { from: alice, value })
       );
     });
 
     it('should fail if exchanger address equals address(0)', async () => {
       const value = web3Utils.toWei('0.1', 'ether');
 
-      await expectedException(
-        () => remitter.sendFund('0x0', passwordHash, 1, { from: alice, value }),
-        3000000
+      await expectedException(() =>
+        remitter.sendFund('0x0', passwordHash, 1, { from: alice, value })
       );
     });
 
@@ -55,39 +53,33 @@ contract('Remitter', accounts => {
         value
       });
 
-      await expectedException(
-        () =>
-          remitter.sendFund(bob, passwordHash, 2, {
-            from: alice,
-            value
-          }),
-        3000000
+      await expectedException(() =>
+        remitter.sendFund(bob, passwordHash, 2, {
+          from: alice,
+          value
+        })
       );
     });
 
     it('should fail if duration equals 0', async () => {
       const value = web3Utils.toWei('0.1', 'ether');
 
-      await expectedException(
-        () =>
-          remitter.sendFund(bob, passwordHash, 0, {
-            from: alice,
-            value
-          }),
-        3000000
+      await expectedException(() =>
+        remitter.sendFund(bob, passwordHash, 0, {
+          from: alice,
+          value
+        })
       );
     });
 
     it('should fail if last block greater than 2102400', async () => {
       const value = web3.toWei('0.1', 'ether');
 
-      await expectedException(
-        () =>
-          remitter.sendFund(bob, passwordHash, 2102401, {
-            from: alice,
-            value
-          }),
-        3000000
+      await expectedException(() =>
+        remitter.sendFund(bob, passwordHash, 2102401, {
+          from: alice,
+          value
+        })
       );
     });
 
@@ -101,26 +93,26 @@ contract('Remitter', accounts => {
         from: alice,
         value
       });
-      const remittanceAfter = await remitter.remittances(passwordHash);
-      const log = logEvent(tx);
+      const log = getTxEvent1stLog(tx);
 
       expect(log.event).to.equal('LogSendFund');
       expect(log.args.sender).to.equal(alice);
       expect(log.args.exchanger).to.equal(bob);
       expect(log.args.passwordHash).to.equal(passwordHash);
       expect(log.args.balance.toString(10)).to.equal(value.toString(10));
+
+      const remittanceAfter = await remitter.remittances(passwordHash);
+
       expect(remittanceAfter[1].toString(10)).to.equal(value.toString(10));
     });
   });
 
   describe('withdraw function', () => {
     it('should fail if remittance balances is empty', async () => {
-      await expectedException(
-        () =>
-          remitter.withdraw(bobPassword, carolPassword, {
-            from: bob
-          }),
-        3000000
+      await expectedException(() =>
+        remitter.withdraw(bobPassword, carolPassword, {
+          from: bob
+        })
       );
     });
 
@@ -132,13 +124,11 @@ contract('Remitter', accounts => {
         value
       });
 
-      await expectedException(
-        () => remitter.withdraw('', carolPassword, { from: bob }),
-        3000000
+      await expectedException(() =>
+        remitter.withdraw('', carolPassword, { from: bob })
       );
-      await expectedException(
-        () => remitter.withdraw(bobPassword, '', { from: bob }),
-        3000000
+      await expectedException(() =>
+        remitter.withdraw(bobPassword, '', { from: bob })
       );
     });
 
@@ -151,12 +141,13 @@ contract('Remitter', accounts => {
       });
 
       const remittanceBefore = await remitter.remittances(passwordHash);
+
       expect(remittanceBefore[1].toString(10)).to.equal(value.toString(10));
 
       const tx = await remitter.withdraw(bobPassword, carolPassword, {
         from: bob
       });
-      const log = logEvent(tx);
+      const log = getTxEvent1stLog(tx);
       const remittanceAfter = await remitter.remittances(passwordHash);
 
       expect(log.event).to.equal('LogWithdraw');
@@ -183,13 +174,14 @@ contract('Remitter', accounts => {
 
     it('should transfer ownership to bob', async () => {
       const tx = await remitter.transferOwnership(bob, { from: alice });
-      const log = logEvent(tx);
+      const log = getTxEvent1stLog(tx);
 
       expect(log.event).to.equal('OwnershipTransferred');
       expect(log.args.previousOwner).to.equal(alice);
       expect(log.args.newOwner).to.equal(bob);
 
       const isOwner = await remitter.isOwner({ from: bob });
+
       expect(isOwner).to.equal(true);
     });
   });
