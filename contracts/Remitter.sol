@@ -6,7 +6,6 @@ contract Remitter is Ownable {
     uint constant ONE_YEAR_OF_BLOCKS = 365 * 86400 / 15;
 
     struct Remittance {
-        address exchanger;
         uint balance;
         uint lastBlock;
     }
@@ -15,7 +14,6 @@ contract Remitter is Ownable {
 
     event LogSendFund(
         address indexed sender,
-        address indexed exchanger,
         bytes32 indexed passwordHash,
         uint balance,
         uint lastBlock
@@ -48,11 +46,10 @@ contract Remitter is Ownable {
 
         uint lastBlock = block.number + blockDuration;
 
-        remittance.exchanger = exchanger;
         remittance.balance = msg.value;
         remittance.lastBlock = lastBlock;
 
-        emit LogSendFund(msg.sender, exchanger, passwordHash, msg.value, blockDuration);
+        emit LogSendFund(msg.sender, passwordHash, msg.value, blockDuration);
 
         return true;
     }
@@ -74,7 +71,6 @@ contract Remitter is Ownable {
         require(balance > 0, "Balance must greater than 0");
         require(block.number <= lastBlock, "withdraw deadline");
 
-        remittance.exchanger = address(0);
         remittance.balance = 0;
         remittance.lastBlock = 0;
 

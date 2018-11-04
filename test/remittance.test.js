@@ -87,7 +87,7 @@ contract('Remitter', accounts => {
       const value = web3Utils.toWei('0.1', 'ether');
       const remittanceBefore = await remitter.remittances(passwordHash);
 
-      expect(remittanceBefore[1].toString(10)).to.not.equal(value.toString(10));
+      expect(remittanceBefore[0].toString(10)).to.not.equal(value.toString(10));
 
       const tx = await remitter.sendFund(bob, passwordHash, 1, {
         from: alice,
@@ -97,13 +97,12 @@ contract('Remitter', accounts => {
 
       expect(log.event).to.equal('LogSendFund');
       expect(log.args.sender).to.equal(alice);
-      expect(log.args.exchanger).to.equal(bob);
       expect(log.args.passwordHash).to.equal(passwordHash);
       expect(log.args.balance.toString(10)).to.equal(value.toString(10));
 
       const remittanceAfter = await remitter.remittances(passwordHash);
 
-      expect(remittanceAfter[1].toString(10)).to.equal(value.toString(10));
+      expect(remittanceAfter[0].toString(10)).to.equal(value.toString(10));
     });
   });
 
@@ -142,7 +141,7 @@ contract('Remitter', accounts => {
 
       const remittanceBefore = await remitter.remittances(passwordHash);
 
-      expect(remittanceBefore[1].toString(10)).to.equal(value.toString(10));
+      expect(remittanceBefore[0].toString(10)).to.equal(value.toString(10));
 
       const tx = await remitter.withdraw(bobPassword, carolPassword, {
         from: bob
@@ -154,8 +153,8 @@ contract('Remitter', accounts => {
       expect(log.args.from).to.equal(bob);
       expect(log.args.balance.toString(10)).to.equal(value.toString(10));
       expect(BigNumber(remittanceAfter[0]).toString(10)).to.equal('0');
+      expect(remittanceAfter[0].toString(10)).to.equal('0');
       expect(remittanceAfter[1].toString(10)).to.equal('0');
-      expect(remittanceAfter[2].toString(10)).to.equal('0');
     });
   });
 
