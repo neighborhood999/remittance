@@ -16,7 +16,7 @@ contract Remitter is Ownable {
     event LogSendFund(
         address indexed sender,
         address indexed exchanger,
-        bytes32 passwordHash,
+        bytes32 indexed passwordHash,
         uint balance,
         uint lastBlock
     );
@@ -69,7 +69,10 @@ contract Remitter is Ownable {
         Remittance storage remittance = remittances[passwordHash];
 
         uint balance = remittance.balance;
+        uint lastBlock = remittance.lastBlock;
+
         require(balance > 0, "Balance must greater than 0");
+        require(block.number <= lastBlock, "withdraw deadline");
 
         remittance.exchanger = address(0);
         remittance.balance = 0;
