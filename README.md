@@ -2,7 +2,25 @@
 
 ![remittance smart contract by Solidity](https://flat.badgen.net/badge/ethereum/solidity/grey)
 
-> to be continued...
+## Install
+
+```sh
+$ yarn install
+```
+
+## TestRPC
+
+```sh
+$ yarn run ganache
+```
+
+## Tests
+
+> Before running tests, make sure you are already running **TestRPC**.
+
+```sh
+$ yarn test
+```
 
 ## LICENSE
 
